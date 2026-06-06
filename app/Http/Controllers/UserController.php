@@ -2,63 +2,70 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\RedirectResponse;
 
 class UserController extends Controller
 {
     public function index()
     {
-        $users = DB::table('users')->get();
+        $users = User::all();
 
         return view('users', compact('users'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
-        $user_name = $_POST['name'];
-        $user_email = $_POST['email'];
-        $user_password = $_POST['password'];
-
-        DB::table('users')->insert([
-            'name' => $user_name,
-            'email' => $user_email,
-            'password' => bcrypt($user_password),
+        $validated = $request->validate([
+            'name' => 'required|min:3|max:50',
+            'email' => 'required|email',
+            'password' => 'required|min:6',
         ]);
+
+        $user = new User;
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->password = bcrypt($request->password);
+        $user->save();
 
         return redirect()->back();
     }
 
     public function destroy($id)
     {
-        DB::table('users')->where('id', $id)->delete();
+        User::where('id', $id)->delete();
 
         return redirect()->back();
     }
 
     public function edit($id)
     {
-        $user = DB::table('users')->where('id', $id)->first();
-        $users = DB::table('users')->get();
+        $user = User::where('id', $id)->first();
+        $users = User::all();
 
         return view('users', compact('user', 'users'));
     }
 
-    public function update()
+    public function update(Request $request)
     {
-        $id = $_POST['id'];
+        $validated = $request->validate([
+            'name' => 'required|min:3|max:50',
+            'email' => 'required|email',
+        ]);
+
+        $id = $request->id;
 
         $data = [
-            'name' => $_POST['name'],
-            'email' => $_POST['email'],
+            'name' => $request->name,
+            'email' => $request->email,
         ];
 
-        if (!empty($_POST['password'])) {
-            $data['password'] = bcrypt($_POST['password']);
+        if (!empty($request->password)) {
+            $data['password'] = bcrypt($request->password);
         }
 
-        DB::table('users')->where('id', '=', $id)->update($data);
+        User::where('id', $id)->update($data);
 
         return redirect('users');
     }

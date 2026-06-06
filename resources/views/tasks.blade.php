@@ -16,7 +16,7 @@
                         <!-- Task Name -->
                         <div class="mb-3">
                             <label for="task-name" class="form-label">Task</label>
-                            <input type="text" name="name" id="task-name" class="form-control" value="{{$task->name}}">
+                            <input type="text" name="name" id="task-name" class="form-control" value="{{$task->name}}" required>
                         </div>
 
                         <!-- Update Task Button -->
@@ -39,8 +39,11 @@
                         <!-- Task Name -->
                         <div class="mb-3">
                             <label for="task-name" class="form-label">Task</label>
-                            <input type="text" name="name" id="task-name" class="form-control" value="">
+                            <input type="text" name="name" id="task-name" class="form-control @error('name') is-invalid @enderror " value="" >
                         </div>
+                                @error('name')
+                                <div class="alert alert-danger">{{ $message }}</div>
+                                  @enderror
 
                         <!-- Add Task Button -->
                         <div>
@@ -82,6 +85,7 @@
                                         <button type="submit" class="btn btn-info">
                                             <i class="fa fa-info me-2"></i>Edit
                                         </button>
+
                                     </form>
                                 </td>
                             </tr>
